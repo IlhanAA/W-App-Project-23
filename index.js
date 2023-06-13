@@ -13,6 +13,7 @@ function convertToFahrenheit(event) {
   let celsiusTemperature = temperatureElement.innerHTML;
   let fahrenheitTemperature = (celsiusTemperature * 9) / 5 + 32;
   temperatureElement.innerHTML = Math.round(fahrenheitTemperature);
+  document.querySelector("#temperature-unit").innerHTML = "°F";
 }
 
 function convertToCelsius(event) {
@@ -21,6 +22,7 @@ function convertToCelsius(event) {
   let fahrenheitTemperature = temperatureElement.innerHTML;
   let celsiusTemperature = ((fahrenheitTemperature - 32) * 5) / 9;
   temperatureElement.innerHTML = Math.round(celsiusTemperature);
+  document.querySelector("#temperature-unit").innerHTML = "°C";
 }
 
 function displayWeatherCondition(response) {
@@ -45,7 +47,7 @@ function displayWeatherCondition(response) {
 }
 
 function search(city) {
-  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6"; // Replace with your OpenWeatherMap API key
+  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
   let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
   axios.get(apiUrl).then(displayWeatherCondition);
 }
