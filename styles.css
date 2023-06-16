@@ -3,7 +3,7 @@ body {
   overflow-x: hidden;
   height: 100%;
   background-repeat: no-repeat;
-  background: azure;
+  background:mintcream;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -142,21 +142,16 @@ li {
   bottom: -50px;
   left: 50%;
   transform: translateX(-50%);
-  color:steelblue;
-}
-
-date,
-.weather-cloud,
-.weather-date {
-  text-align: left;
+  color:skyblue;
 }
 
 .weather-app ul {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  text-align: left;
+  padding-left: 0;
+  margin-top: 10px;
 }
 
 .weather-app ul li {
+  list-style: none;
   margin-bottom: 10px;
 }
