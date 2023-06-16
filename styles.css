@@ -56,8 +56,8 @@ h3 {
 }
 
 .col {
-  color:cornflowerblue;
-  font-family:'Courier New', Courier, monospace;
+  color: cornflowerblue;
+  font-family: "Courier New", Courier, monospace;
   font-size: 45px;
   padding: 8px;
   bottom: -70px;
@@ -138,11 +138,5 @@ li {
 }
 
 .code-link {
-  margin-top: 20px;
-  color:deepskyblue;
+  margin-top: 50px;
 }
-
-.source-link {
-  text-decoration: none;
-}
-
