@@ -151,17 +151,10 @@ li {
   margin-top: 10px;
 }
 
-.weather-app ul li {
-  list-style: none;
-  margin-bottom: 5px;
+.weather-app .weakly-weather {
+  margin-top: 20px;
 }
 
-.weather-app .weakly-weather .col {
-  padding: 0;
+.weather-app .weakly-weather .week {
+  margin-top: 10px;
 }
-
-.weakly-weather .col {
-  padding: 8px;
-  bottom: 0;
-}
-
