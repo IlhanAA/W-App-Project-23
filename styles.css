@@ -138,6 +138,8 @@ li {
 }
 
 .code-link {
-  margin-top:50px;
-  color:blue;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
 }
