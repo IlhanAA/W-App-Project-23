@@ -65,15 +65,17 @@ h3 {
 
 .week {
   display: flex;
-  justify-content: space-between;
-  align-items: center; /* Add vertical alignment */
   padding: 30px;
+  text-align: center;
 }
 
 .week .col {
   flex: 1 0 0;
   padding: 8px;
+  margin-right: 10px;
+  bottom: -95px;
 }
+
 
 .temperature {
   color: white;
