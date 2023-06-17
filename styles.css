@@ -65,24 +65,31 @@ h3 {
 
 .week {
   display: flex;
-  justify-content: center; /* Center the weekdays horizontally */
+  justify-content: center;
   padding: 30px;
   text-align: center;
 }
 
 .week .col {
-  flex: 1 0 auto;
+  flex: 1;
   padding: 8px;
-  bottom: -95px; /* Adjust this value to increase or decrease the distance from the bottom */
-  margin: 0 10px; /* Add margin to create space between weekdays */
+  margin: 0 5px; /* Adjust the margin value to create equal spacing */
 }
 
-.week .col:first-child {
-  margin-left: 0; /* Remove left margin for the first weekday */
+.temperature {
+  color: white;
+  font-size: 60px;
+  font-weight: 400;
+  line-height: 1;
 }
 
-.week .col:last-child {
-  margin-right: 0; /* Remove right margin for the last weekday */
+/* Remove the following rules if they are not needed */
+.col {
+  bottom: -70px;
+}
+
+.card {
+  margin-right: 0; /* Remove the fixed margin-right value */
 }
 
 
