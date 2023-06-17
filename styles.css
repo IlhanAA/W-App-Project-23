@@ -65,6 +65,7 @@ h3 {
 
 .week {
   display: flex;
+  justify-content: center; /* Center the weekdays horizontally */
   padding: 30px;
   text-align: center;
 }
@@ -72,8 +73,10 @@ h3 {
 .week .col {
   flex: 1 0 0;
   padding: 8px;
-  bottom: -95px;
+  bottom: -95px; 
+  margin: 0 5px; /* Add margin to create space between weekdays */
 }
+
 
 .temperature {
   color: white;
