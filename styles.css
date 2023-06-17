@@ -65,7 +65,8 @@ h3 {
 
 .week {
   display: flex;
-  justify-content: space-between; /* Add space between the weekdays */
+  justify-content: space-between;
+  align-items: center; /* Add vertical alignment */
   padding: 30px;
 }
 
