@@ -65,29 +65,15 @@ h3 {
 
 .week {
   display: flex;
-  justify-content: center;
   padding: 30px;
   text-align: center;
-  margin-bottom: 20px; /* Add margin-bottom to create space between the weekdays and the temperature */
 }
 
 .week .col {
-  flex: 1;
+  flex: 1 0 0;
   padding: 8px;
+  bottom: -95px; /* Adjust this value to increase or decrease the distance from the bottom */
 }
-
-.week .col:first-child {
-  margin-left: 0; /* Remove left margin for the first weekday */
-}
-
-.week .col:last-child {
-  margin-right: 0; /* Remove right margin for the last weekday */
-}
-
-.week .col:not(:first-child) {
-  margin-left: 10px; /* Add left margin to create space between weekdays */
-}
-
 
 .temperature {
   color: white;
