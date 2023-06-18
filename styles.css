@@ -65,7 +65,7 @@ h3 {
 
 .week {
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Center the weekdays horizontally */
   padding: 30px;
   text-align: center;
 }
@@ -85,8 +85,9 @@ h3 {
 }
 
 .week .col:not(:first-child):not(:last-child) {
-  margin: 0 10px; /* Adjust this value to increase or decrease the space between weekdays */
+  margin: 0 auto; /* Center the remaining weekdays */
 }
+
 
 
 .temperature {
