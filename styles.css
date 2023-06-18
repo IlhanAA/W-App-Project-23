@@ -19,9 +19,10 @@ body {
   padding: 10px;
   margin-top: 100px;
   margin-bottom: 100px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: 50px;
+  margin-right: 400px;
 }
+
 .display-3 {
   font-family: serif;
   font-size: 30px;
@@ -59,6 +60,7 @@ h3 {
   font-family: "Courier New", Courier, monospace;
   font-size: 45px;
   padding: 8px;
+  bottom: -70px;
 }
 
 .week {
@@ -71,10 +73,19 @@ h3 {
 .week .col {
   flex: 1;
   padding: 8px;
+  bottom: -95px; /* Adjust this value to increase or decrease the distance from the bottom */
 }
 
-.week .col:not(:first-child) {
-  margin-left: 10px; /* Add left margin to create space between weekdays */
+.week .col:first-child {
+  margin-left: auto; /* Add auto margin to the left of the first weekday */
+}
+
+.week .col:last-child {
+  margin-right: auto; /* Add auto margin to the right of the last weekday */
+}
+
+.week .col:not(:first-child):not(:last-child) {
+  margin: 0 10px; /* Adjust this value to increase or decrease the space between weekdays */
 }
 
 
