@@ -171,3 +171,26 @@ li {
   font-size: 14px;
   color: #666;
 }
+
+.weekly-weather {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.weekly-weather .col {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+}
+
+.weekly-weather .forecast-day {
+  font-size: 14px;
+  color: #666;
+}
+
+.weekly-weather .forecast-temperature {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}

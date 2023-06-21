@@ -44,21 +44,6 @@ function displayWeatherCondition(response) {
   let timeZoneOffset = response.data.timezone; // Time zone offset in seconds
   currentTime.setSeconds(currentTime.getSeconds() + timeZoneOffset); // Adjust the time with the time zone offset
   dateElement.innerHTML = formatDate(currentTime);
-
-  // Fetch and display the weekly weather forecast
-  fetchWeeklyForecast(response.data.name);
-}
-
-function search(city) {
-  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
-  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-  axios.get(apiUrl).then(displayWeatherCondition);
-}
-
-function fetchWeeklyForecast(city) {
-  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
-  let apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
-  axios.get(apiUrl).then(displayWeeklyForecast);
 }
 
 function displayWeeklyForecast(response) {
@@ -82,6 +67,24 @@ function displayWeeklyForecast(response) {
 
     forecastElement.innerHTML += forecastHtml;
   }
+}
+
+function search(city) {
+  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
+  let currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+  let weeklyForecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+
+  axios
+    .get(currentWeatherUrl)
+    .then(function (response) {
+      displayWeatherCondition(response);
+
+      // Fetch and display the weekly weather forecast
+      return axios.get(weeklyForecastUrl);
+    })
+    .then(function (response) {
+      displayWeeklyForecast(response);
+    });
 }
 
 function handleSubmit(event) {
@@ -117,9 +120,6 @@ function searchCurrent(event) {
       let timeZoneOffset = response.data.timezone; // Time zone offset in seconds
       currentTime.setSeconds(currentTime.getSeconds() + timeZoneOffset); // Adjust the time with the time zone offset
       dateElement.innerHTML = formatDate(currentTime);
-
-      // Fetch and display the weekly weather forecast
-      fetchWeeklyForecast(response.data.name);
     });
   });
 }
