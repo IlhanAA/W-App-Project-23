@@ -1,4 +1,32 @@
+function formatDate(date) {
+  return date.toLocaleString(undefined, {
+    weekday: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  });
+}
+
+function convertToFahrenheit(event) {
+  event.preventDefault();
+  let temperatureElement = document.querySelector("#temperature");
+  let celsiusTemperature = temperatureElement.innerHTML;
+  let fahrenheitTemperature = (celsiusTemperature * 9) / 5 + 32;
+  temperatureElement.innerHTML = Math.round(fahrenheitTemperature);
+  document.querySelector("#temperature-unit").innerHTML = "°F";
+}
+
+function convertToCelsius(event) {
+  event.preventDefault();
+  let temperatureElement = document.querySelector("#temperature");
+  let fahrenheitTemperature = temperatureElement.innerHTML;
+  let celsiusTemperature = ((fahrenheitTemperature - 32) * 5) / 9;
+  temperatureElement.innerHTML = Math.round(celsiusTemperature);
+  document.querySelector("#temperature-unit").innerHTML = "°C";
+}
+
 function displayWeatherCondition(response) {
+  // Update the weather information on the page
   document.querySelector("#city").innerHTML = response.data.name;
   document.querySelector("#temperature").innerHTML = Math.round(
     response.data.main.temp
@@ -12,39 +40,48 @@ function displayWeatherCondition(response) {
 
   // Update the date and time
   let dateElement = document.querySelector("#date");
-  let currentTime = new Date(response.data.dt * 1000);
-  let timeZoneOffset = response.data.timezone;
-  currentTime.setSeconds(currentTime.getSeconds() + timeZoneOffset);
+  let currentTime = new Date(response.data.dt * 1000); // Convert Unix timestamp to milliseconds
+  let timeZoneOffset = response.data.timezone; // Time zone offset in seconds
+  currentTime.setSeconds(currentTime.getSeconds() + timeZoneOffset); // Adjust the time with the time zone offset
   dateElement.innerHTML = formatDate(currentTime);
-}
 
-function displayWeeklyForecast(response) {
-  let dailyForecasts = response.data.daily.slice(1, 6);
-  let weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  let weekElements = document.querySelectorAll(".week .col");
-
-  dailyForecasts.forEach((forecast, index) => {
-    let forecastDate = new Date(forecast.dt * 1000);
-    let dayOfWeek = weekDays[forecastDate.getDay()];
-    let temperature = Math.round(forecast.temp.day);
-    let weatherIcon = forecast.weather[0].icon;
-
-    weekElements[index].querySelector("h6").innerHTML = dayOfWeek;
-    weekElements[index].querySelector(
-      "h1"
-    ).innerHTML = `<img src="http://openweathermap.org/img/wn/${weatherIcon}.png" alt="${forecast.weather[0].description}" />`;
-    weekElements[index].querySelector("h5").innerHTML = `${temperature}°C`;
-  });
+  // Fetch and display the weekly weather forecast
+  fetchWeeklyForecast(response.data.name);
 }
 
 function search(city) {
   let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
   let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
   axios.get(apiUrl).then(displayWeatherCondition);
+}
 
-  // Fetch weekly forecast
-  let apiForecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${response.data.coord.lat}&lon=${response.data.coord.lon}&exclude=current,minutely,hourly,alerts&appid=${apiKey}&units=metric`;
-  axios.get(apiForecastUrl).then(displayWeeklyForecast);
+function fetchWeeklyForecast(city) {
+  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
+  let apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(displayWeeklyForecast);
+}
+
+function displayWeeklyForecast(response) {
+  let forecastElement = document.querySelector("#weekly-forecast");
+  forecastElement.innerHTML = "";
+
+  for (let i = 0; i < 5; i++) {
+    let forecast = response.data.list[i];
+    let forecastDate = new Date(forecast.dt * 1000);
+    let forecastDay = forecastDate.toLocaleString("en-US", {
+      weekday: "short",
+    });
+    let forecastTemperature = Math.round(forecast.main.temp);
+
+    let forecastHtml = `
+      <div class="col">
+        <div class="forecast-day">${forecastDay}</div>
+        <div class="forecast-temperature">${forecastTemperature}°C</div>
+      </div>
+    `;
+
+    forecastElement.innerHTML += forecastHtml;
+  }
 }
 
 function handleSubmit(event) {
@@ -55,29 +92,52 @@ function handleSubmit(event) {
 
 function searchCurrent(event) {
   event.preventDefault();
+  let cityElement = document.querySelector("#city");
+  let temperatureElement = document.querySelector("#temperature");
+  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
+
   navigator.geolocation.getCurrentPosition(function (position) {
     let lat = position.coords.latitude;
     let lon = position.coords.longitude;
-    let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
-    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
-    axios.get(apiUrl).then(displayWeatherCondition);
-    let apiForecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,hourly,alerts&appid=${apiKey}&units=metric`;
-    axios.get(apiForecastUrl).then(displayWeeklyForecast);
+    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+    axios.get(url).then(function (response) {
+      cityElement.innerHTML = response.data.name;
+      temperatureElement.innerHTML = Math.round(response.data.main.temp);
+      document.querySelector("#humidity").innerHTML =
+        response.data.main.humidity;
+      document.querySelector("#wind").innerHTML = Math.round(
+        response.data.wind.speed
+      );
+      document.querySelector("#description").innerHTML =
+        response.data.weather[0].main;
+
+      // Update the date and time
+      let dateElement = document.querySelector("#date");
+      let currentTime = new Date(response.data.dt * 1000); // Convert Unix timestamp to milliseconds
+      let timeZoneOffset = response.data.timezone; // Time zone offset in seconds
+      currentTime.setSeconds(currentTime.getSeconds() + timeZoneOffset); // Adjust the time with the time zone offset
+      dateElement.innerHTML = formatDate(currentTime);
+
+      // Fetch and display the weekly weather forecast
+      fetchWeeklyForecast(response.data.name);
+    });
   });
 }
 
-function formatDate(date) {
-  let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  let day = days[date.getDay()];
-  let hours = date.getHours().toString().padStart(2, "0");
-  let minutes = date.getMinutes().toString().padStart(2, "0");
-  return `${day} ${hours}:${minutes}`;
-}
+let dateElement = document.querySelector("#date");
+let currentTime = new Date();
+dateElement.innerHTML = formatDate(currentTime);
 
 let searchForm = document.querySelector("#search-form");
 searchForm.addEventListener("submit", handleSubmit);
 
-let currentLocationButton = document.querySelector("#current-location-button");
-currentLocationButton.addEventListener("click", searchCurrent);
+let fahrenheitLink = document.querySelector("#fahrenheit-link");
+fahrenheitLink.addEventListener("click", convertToFahrenheit);
 
-search("London");
+let celsiusLink = document.querySelector("#celsius-link");
+celsiusLink.addEventListener("click", convertToCelsius);
+
+let currentForm = document.querySelector("#current-weather");
+currentForm.addEventListener("click", searchCurrent);
+
+search("Paris");
