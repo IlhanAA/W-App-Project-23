@@ -3,7 +3,7 @@ body {
   overflow-x: hidden;
   height: 100%;
   background-repeat: no-repeat;
-  background:mintcream;
+  background: mintcream;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -29,14 +29,14 @@ body {
 }
 
 .date {
-  text-align: left; /* Align the date to the left */
+  text-align: left;
 }
 
 .weather-cloud,
 .weather-date {
   font-family: monospace;
   font-size: 15px;
-  text-align: left; /* Align the weather description to the left */
+  text-align: left;
 }
 
 h3 {
@@ -65,7 +65,7 @@ h3 {
 
 .week {
   display: flex;
-  justify-content: center; /* Center the weekdays horizontally */
+  justify-content: center;
   text-align: center;
   padding: 30px;
 }
@@ -73,11 +73,10 @@ h3 {
 .week .col {
   flex: 1;
   padding: 8px;
-  bottom: -95px; /* Adjust this value to increase or decrease the distance from the bottom */
-margin-left: auto;
-margin-right: auto;
+  bottom: -95px;
+  margin-left: auto;
+  margin-right: auto;
 }
-
 
 .temperature {
   color: white;
@@ -146,12 +145,41 @@ li {
   bottom: -50px;
   left: 50%;
   transform: translateX(-50%);
-  color:skyblue;
+  color: skyblue;
 }
 
 .weather-app ul {
   text-align: left;
-  padding-left: 0;
-  margin-top: 10px;
+  margin-left: 50px;
+  margin-top: 20px;
+  margin-bottom: 0px;
+  list-style-type: none;
 }
 
+.weather-app ul li {
+  display: inline-block;
+  margin-right: 30px;
+  margin-top: 30px;
+  font-size: 24px;
+  font-family: monospace;
+  color: black;
+}
+
+.weather-app ul li a {
+  color: black;
+}
+
+.forecast-day {
+  display: inline-block;
+  width: 150px;
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.weather-icon {
+  height: 50px;
+  width: 50px;
+  margin-bottom: 10px;
+}
