@@ -75,6 +75,48 @@ function displayWeeklyWeatherForecast(forecastData) {
   });
 }
 
+function getForecast(coords) {
+  let apiUrl = `https://api.shecodes.io/weather/v1/forecast?lat=${coords.latitude}&lon=${coords.longitude}&key=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(displayWeatherForecast);
+}
+
+function formatDay(timestamp) {
+  let date = new Date(timestamp * 1000);
+  let day = date.getDay();
+  let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  return days[day];
+}
+
+function displayWeatherForecast(response) {
+  let weatherForecast = response.data.daily;
+  let forecastElement = document.querySelector("#weather-forecast");
+
+  let forecastHTML = `<div class="row">`;
+  weatherForecast.forEach(function (forecastDay, index) {
+    if (index < 6) {
+      forecastHTML += `
+        <div class="col-2 forecastDay">
+          <div class="forecast-date">${formatDay(forecastDay.time)}</div>
+          <img src="http://shecodes-assets.s3.amazonaws.com/api/weather/icons/${
+            forecastDay.condition.icon
+          }.png" alt="" width="42" />
+          <div class="forecast-temp">
+            <span class="max">${Math.round(
+              forecastDay.temperature.maximum
+            )}°</span>
+            <span class="min">${Math.round(
+              forecastDay.temperature.minimum
+            )}°</span>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  forecastHTML += `</div>`;
+  forecastElement.innerHTML = forecastHTML;
+}
+
 function search(city) {
   let currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
   let forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
@@ -154,16 +196,11 @@ let dateElement = document.querySelector("#date");
 let currentTime = new Date();
 dateElement.innerHTML = formatDate(currentTime);
 
-let searchForm = document.querySelector("#search-form");
-searchForm.addEventListener("submit", handleSubmit);
+document.querySelector("#search-form").addEventListener("submit", handleSubmit);
 
-let fahrenheitLink = document.querySelector("#fahrenheit-link");
-fahrenheitLink.addEventListener("click", convertToFahrenheit);
+document
+  .querySelector("#current-location-button")
+  .addEventListener("click", searchCurrent);
 
-let celsiusLink = document.querySelector("#celsius-link");
-celsiusLink.addEventListener("click", convertToCelsius);
-
-let currentForm = document.querySelector("#current-weather");
-currentForm.addEventListener("click", searchCurrent);
-
-search("Paris");
+// Call the searchCurrent function by default to display weather for the user's current location
+searchCurrent();
