@@ -1,3 +1,5 @@
+const apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
+
 function formatDate(date) {
   return date.toLocaleString(undefined, {
     weekday: "long",
@@ -46,44 +48,55 @@ function displayWeatherCondition(response) {
   dateElement.innerHTML = formatDate(currentTime);
 }
 
-function displayWeeklyForecast(response) {
-  let forecastElement = document.querySelector("#weekly-forecast");
-  forecastElement.innerHTML = "";
+function displayWeeklyWeatherForecast(forecastData) {
+  let forecastContainer = document.querySelector("#forecast-container");
+  forecastContainer.innerHTML = ""; // Clear previous forecast data
 
-  for (let i = 0; i < 5; i++) {
-    let forecast = response.data.list[i];
-    let forecastDate = new Date(forecast.dt * 1000);
-    let forecastDay = forecastDate.toLocaleString("en-US", {
-      weekday: "short",
-    });
-    let forecastTemperature = Math.round(forecast.main.temp);
+  forecastData.forEach((forecast) => {
+    let forecastCard = document.createElement("div");
+    forecastCard.classList.add("forecast-card");
 
-    let forecastHtml = `
-      <div class="col">
-        <div class="forecast-day">${forecastDay}</div>
-        <div class="forecast-temperature">${forecastTemperature}°C</div>
-      </div>
-    `;
+    let dateElement = document.createElement("div");
+    dateElement.classList.add("forecast-date");
+    dateElement.innerHTML = forecast.date;
+    forecastCard.appendChild(dateElement);
 
-    forecastElement.innerHTML += forecastHtml;
-  }
+    let temperatureElement = document.createElement("div");
+    temperatureElement.classList.add("forecast-temperature");
+    temperatureElement.innerHTML = Math.round(forecast.temperature) + "°C";
+    forecastCard.appendChild(temperatureElement);
+
+    let descriptionElement = document.createElement("div");
+    descriptionElement.classList.add("forecast-description");
+    descriptionElement.innerHTML = forecast.description;
+    forecastCard.appendChild(descriptionElement);
+
+    forecastContainer.appendChild(forecastCard);
+  });
 }
 
 function search(city) {
-  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
   let currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-  let weeklyForecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+  let forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
 
   axios
-    .get(currentWeatherUrl)
-    .then(function (response) {
-      displayWeatherCondition(response);
-
-      // Fetch and display the weekly weather forecast
-      return axios.get(weeklyForecastUrl);
-    })
-    .then(function (response) {
-      displayWeeklyForecast(response);
+    .all([axios.get(currentWeatherUrl), axios.get(forecastUrl)])
+    .then(
+      axios.spread((currentWeatherResponse, forecastResponse) => {
+        displayWeatherCondition(currentWeatherResponse);
+        let forecastData = forecastResponse.data.list.map((forecast) => {
+          return {
+            date: formatDate(new Date(forecast.dt * 1000)),
+            temperature: forecast.main.temp,
+            description: forecast.weather[0].description,
+          };
+        });
+        displayWeeklyWeatherForecast(forecastData);
+      })
+    )
+    .catch((error) => {
+      console.log(error);
+      throw new Error("Unable to fetch weather data.");
     });
 }
 
@@ -97,30 +110,43 @@ function searchCurrent(event) {
   event.preventDefault();
   let cityElement = document.querySelector("#city");
   let temperatureElement = document.querySelector("#temperature");
-  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
 
   navigator.geolocation.getCurrentPosition(function (position) {
     let lat = position.coords.latitude;
     let lon = position.coords.longitude;
-    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
-    axios.get(url).then(function (response) {
-      cityElement.innerHTML = response.data.name;
-      temperatureElement.innerHTML = Math.round(response.data.main.temp);
-      document.querySelector("#humidity").innerHTML =
-        response.data.main.humidity;
-      document.querySelector("#wind").innerHTML = Math.round(
-        response.data.wind.speed
-      );
-      document.querySelector("#description").innerHTML =
-        response.data.weather[0].main;
+    let currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+    let forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
 
-      // Update the date and time
-      let dateElement = document.querySelector("#date");
-      let currentTime = new Date(response.data.dt * 1000); // Convert Unix timestamp to milliseconds
-      let timeZoneOffset = response.data.timezone; // Time zone offset in seconds
-      currentTime.setSeconds(currentTime.getSeconds() + timeZoneOffset); // Adjust the time with the time zone offset
-      dateElement.innerHTML = formatDate(currentTime);
-    });
+    axios
+      .all([axios.get(currentWeatherUrl), axios.get(forecastUrl)])
+      .then(
+        axios.spread((currentWeatherResponse, forecastResponse) => {
+          cityElement.innerHTML = currentWeatherResponse.data.name;
+          temperatureElement.innerHTML = Math.round(
+            currentWeatherResponse.data.main.temp
+          );
+          document.querySelector("#humidity").innerHTML =
+            currentWeatherResponse.data.main.humidity;
+          document.querySelector("#wind").innerHTML = Math.round(
+            currentWeatherResponse.data.wind.speed
+          );
+          document.querySelector("#description").innerHTML =
+            currentWeatherResponse.data.weather[0].main;
+
+          let forecastData = forecastResponse.data.list.map((forecast) => {
+            return {
+              date: formatDate(new Date(forecast.dt * 1000)),
+              temperature: forecast.main.temp,
+              description: forecast.weather[0].description,
+            };
+          });
+          displayWeeklyWeatherForecast(forecastData);
+        })
+      )
+      .catch((error) => {
+        console.log(error);
+        throw new Error("Unable to fetch weather data.");
+      });
   });
 }
 
