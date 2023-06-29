@@ -1,110 +1,108 @@
-(() => {
-  const apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6"; 
-  // Get weather data for a specific location
-  function getWeatherData(location) {
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
-    return axios.get(apiUrl);
-  }
+function formatDate(date) {
+  return date.toLocaleString(undefined, {
+    weekday: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  });
+}
 
-  // Get weather forecast data for a specific location
-  function getForecastData(location) {
-    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&appid=${apiKey}&units=metric`;
-    return axios.get(apiUrl);
-  }
+function convertToFahrenheit(event) {
+  event.preventDefault();
+  let temperatureElement = document.querySelector("#temperature");
+  let celsiusTemperature = temperatureElement.innerHTML;
+  let fahrenheitTemperature = (celsiusTemperature * 9) / 5 + 32;
+  temperatureElement.innerHTML = Math.round(fahrenheitTemperature);
+  document.querySelector("#temperature-unit").innerHTML = "°F";
+}
 
-  // Format date string
-  function formatDate(dateString) {
-    const options = { weekday: "short", month: "short", day: "numeric" };
-    return new Date(dateString).toLocaleDateString("en-US", options);
-  }
+function convertToCelsius(event) {
+  event.preventDefault();
+  let temperatureElement = document.querySelector("#temperature");
+  let fahrenheitTemperature = temperatureElement.innerHTML;
+  let celsiusTemperature = ((fahrenheitTemperature - 32) * 5) / 9;
+  temperatureElement.innerHTML = Math.round(celsiusTemperature);
+  document.querySelector("#temperature-unit").innerHTML = "°C";
+}
 
-  // Display current weather data
-  function displayCurrentWeather(weatherData) {
-    const { name, main, weather } = weatherData;
-    const { temp } = main;
-    const { description, icon } = weather[0];
+function displayWeatherCondition(response) {
+  // Update the weather information on the page
+  document.querySelector("#city").innerHTML = response.data.name;
+  document.querySelector("#temperature").innerHTML = Math.round(
+    response.data.main.temp
+  );
+  document.querySelector("#humidity").innerHTML = response.data.main.humidity;
+  document.querySelector("#wind").innerHTML = Math.round(
+    response.data.wind.speed
+  );
+  document.querySelector("#description").innerHTML =
+    response.data.weather[0].main;
 
-    const cityElement = document.querySelector(".weather-city");
-    const temperatureElement = document.querySelector(".weather-temperature");
-    const descriptionElement = document.querySelector(".weather-description");
-    const iconElement = document.querySelector(".weather-icon");
+  // Update the date and time
+  let dateElement = document.querySelector("#date");
+  let currentTime = new Date(response.data.dt * 1000); // Convert Unix timestamp to milliseconds
+  let timeZoneOffset = response.data.timezone; // Time zone offset in seconds
+  currentTime.setSeconds(currentTime.getSeconds() + timeZoneOffset); // Adjust the time with the time zone offset
+  dateElement.innerHTML = formatDate(currentTime);
+}
 
-    cityElement.textContent = name;
-    temperatureElement.textContent = Math.round(temp);
-    descriptionElement.textContent = description;
-    iconElement.setAttribute(
-      "src",
-      `http://openweathermap.org/img/w/${icon}.png`
-    );
-  }
+function search(city) {
+  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
+  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(displayWeatherCondition);
+}
 
-  // Display weather forecast data
-  function displayForecastData(forecastData) {
-    const forecastElement = document.querySelector(".weather-forecast");
+function handleSubmit(event) {
+  event.preventDefault();
+  let city = document.querySelector("#city-input").value;
+  search(city);
+}
 
-    // Clear previous forecast data
-    forecastElement.innerHTML = "";
+function searchCurrent(event) {
+  event.preventDefault();
+  let cityElement = document.querySelector("#city");
+  let temperatureElement = document.querySelector("#temperature");
+  let apiKey = "d67bbe29313bc14b75d0c7a4f0128bd6";
 
-    // Display forecast for each day
-    for (let i = 0; i < forecastData.length; i++) {
-      const { dt_txt, main, weather } = forecastData[i];
-      const { temp } = main;
-      const { icon } = weather[0];
-
-      const forecastDayElement = document.createElement("div");
-      forecastDayElement.className = "forecast-day";
-
-      const dateElement = document.createElement("p");
-      dateElement.textContent = formatDate(dt_txt);
-      forecastDayElement.appendChild(dateElement);
-
-      const iconElement = document.createElement("img");
-      iconElement.className = "weather-icon";
-      iconElement.setAttribute(
-        "src",
-        `http://openweathermap.org/img/w/${icon}.png`
+  navigator.geolocation.getCurrentPosition(function (position) {
+    let lat = position.coords.latitude;
+    let lon = position.coords.longitude;
+    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+    axios.get(url).then(function (response) {
+      cityElement.innerHTML = response.data.name;
+      temperatureElement.innerHTML = Math.round(response.data.main.temp);
+      document.querySelector("#humidity").innerHTML =
+        response.data.main.humidity;
+      document.querySelector("#wind").innerHTML = Math.round(
+        response.data.wind.speed
       );
-      forecastDayElement.appendChild(iconElement);
+      document.querySelector("#description").innerHTML =
+        response.data.weather[0].main;
 
-      const temperatureElement = document.createElement("p");
-      temperatureElement.textContent = Math.round(temp);
-      forecastDayElement.appendChild(temperatureElement);
+      // Update the date and time
+      let dateElement = document.querySelector("#date");
+      let currentTime = new Date(response.data.dt * 1000); // Convert Unix timestamp to milliseconds
+      let timeZoneOffset = response.data.timezone; // Time zone offset in seconds
+      currentTime.setSeconds(currentTime.getSeconds() + timeZoneOffset); // Adjust the time with the time zone offset
+      dateElement.innerHTML = formatDate(currentTime);
+    });
+  });
+}
 
-      forecastElement.appendChild(forecastDayElement);
-    }
-  }
+let dateElement = document.querySelector("#date");
+let currentTime = new Date();
+dateElement.innerHTML = formatDate(currentTime);
 
-  // Get the location from the search input and fetch weather data
-  function searchWeather(event) {
-    event.preventDefault();
-    const searchInput = document.querySelector(".search-input");
-    const location = searchInput.value;
+let searchForm = document.querySelector("#search-form");
+searchForm.addEventListener("submit", handleSubmit);
 
-    if (location) {
-      getWeatherData(location)
-        .then((response) => {
-          const { data } = response;
-          displayCurrentWeather(data);
-        })
-        .catch((error) => {
-          console.log("Error:", error);
-        });
+let fahrenheitLink = document.querySelector("#fahrenheit-link");
+fahrenheitLink.addEventListener("click", convertToFahrenheit);
 
-      getForecastData(location)
-        .then((response) => {
-          const { data } = response;
-          const forecastData = data.list.filter((item) =>
-            item.dt_txt.includes("12:00:00")
-          );
-          displayForecastData(forecastData);
-        })
-        .catch((error) => {
-          console.log("Error:", error);
-        });
-    }
-  }
+let celsiusLink = document.querySelector("#celsius-link");
+celsiusLink.addEventListener("click", convertToCelsius);
 
-  // Add event listener to the search form
-  const searchForm = document.querySelector(".search-form");
-  searchForm.addEventListener("submit", searchWeather);
-})();
+let currentForm = document.querySelector("#current-weather");
+currentForm.addEventListener("click", searchCurrent);
+
+search("Paris");
